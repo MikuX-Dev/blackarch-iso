@@ -1,0 +1,14 @@
+*.iso
+work/
+out/
+
+/.gnupg/
+/.subversion/
+
+*.swp
+*~
+*.tmp
+tags
+
+.MTREE
+.PKGINFO
