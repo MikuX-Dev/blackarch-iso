@@ -12,8 +12,9 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     container:
-      image: mikuxdev/archiso-builder:latest
+      image: mikuxdev/archiso-builder
       options: --privileged
+
     steps:
       - name: Checkout files
         uses: actions/checkout@v3
@@ -23,11 +24,6 @@ jobs:
 
       - name: Install dependencies
         run: | 
-          pacman -Scc --noconfirm
-          rm -rf /var/cache/pacman/pkg/*
-          pacman-key --init
-          pacman-key --populate
-          sh -c "curl https://archlinux.org/mirrorlist/\?country=all\&protocol=http\&protocol=https\&ip_version=4\&ip_version=6\&use_mirror_status=on -o /etc/pacman.d/mirrorlist && sed -i 's/#S/S/g' /etc/pacman.d/mirrorlist"
           pacman -Syy
 
       - name: Build ArchISO
