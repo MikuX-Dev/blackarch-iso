@@ -1,15 +1,28 @@
 #!/bin/bash
 
+# Check if the script is being run as root
+if [ "$(id -u)" != 0 ]; then
+  echo "This script must be run as root. Exiting."
+  exit 1
+fi
+
 # Function to perform cleanup
 cleanup() {
   echo "Cleaning up..."
-  sudo rm -rf work/*
+  rm -rf "$temp_dir"
   echo "Cleanup complete. Exiting."
   exit 1
 }
 
 # Set up a trap for interrupt signal (Ctrl+C)
 trap cleanup INT
+
+# Determine the number of available CPU cores
+cpu_cores=$(nproc)
+half_cores=$((cpu_cores / 2))
+
+# Get the directory where the script is located
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Prompt the user to choose the type of ISO to build
 echo "Choose the type of ISO to build:"
@@ -20,30 +33,27 @@ echo "3. all-iso"
 # Read the user's choice
 read -p "Enter your choice (1/2/3): " choice
 
-# Set the iso_type variable based on the user's choice
+# Set the iso_types array based on the user's choice
 case $choice in
-  1) iso_type="slim-iso" ;;
-  3) iso_type="full-iso" ;;
-  4) iso_type="all-iso" ;;
+  1) iso_types=("slim-iso") ;;
+  2) iso_types=("full-iso") ;;
+  3) iso_types=("slim-iso" "full-iso") ;;
   *) echo "Invalid choice. Exiting." ; exit 1 ;;
 esac
 
-# Ask the user if they want to copy the output to a file
-read -p "Do you want to copy the output to a file? (y/n): " copy_output
+# Create a temporary directory for building the ISOs
+temp_dir=$(mktemp -d)
+echo "Using temporary directory: $temp_dir"
 
-# Define the output file name
-output_file="output.log"
+# Build each ISO type with specified build modes and redirect output and errors to a log file
+for iso_type in "${iso_types[@]}"; do
+  echo "Building $iso_type..."
+  mkarchiso -v -w "$temp_dir/work" -o "$script_dir/out" "$iso_type" > >(tee "$script_dir/$iso_type'$(date +%Y.%m.%d)'.log") 2>&1
+  echo "$iso_type build complete."
+done
 
-# Run the mkarchiso command with the chosen ISO type
-if [[ "$copy_output" == "y" ]]; then
-  sudo mkarchiso -v -w work -o out "$iso_type" &> "$output_file"
-else
-  sudo mkarchiso -v -w work -o out "$iso_type"
-fi
-
-# Clean up the work directory
-sudo rm -rf work/*
+# Clean up the temporary directory
+rm -rf "$temp_dir"
 
 # Exit the script
 exit
-

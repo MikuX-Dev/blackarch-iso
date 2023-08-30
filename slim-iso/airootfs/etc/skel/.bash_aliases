@@ -1,0 +1,238 @@
+# Alias;
+# File Management:
+alias cp="cp -iv" # confirm before overwriting something
+alias rm="rm -iv"
+alias mv="mv -iv"
+alias df="df -h" # human-readable sizes
+alias du="du -h"
+
+# Directory Operations:
+alias smd="sudo mkdir -p"
+alias md="mkdir -p"
+alias cd..="cd ../"
+alias home='cd ~'
+alias cd..='cd ..'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+
+# System Info:
+alias free="free -h"
+
+# Listing Files:
+# alias ll="ls -al"
+# alias la="ls -a"
+# alias ls="ls --color=auto"
+# alias sl="ls --color=auto"
+# alias l="ls -ahls --color=auto"
+alias ls='exa -l --colour always'
+alias la='exa -l --colour always --all'
+alias l='exa --color-scale --group-directories-first -l --all'
+alias ll='exa --color-scale --group-directories-first -l --all'
+
+# Text Editors:
+alias vi="vim"
+alias svi='sudo vim'
+alias nv="nvim"
+alias snv="sudo nvim"
+
+# File Browsing:
+alias files="ranger"
+
+# Network Operations:
+alias curl="curl --user-agent 'noleak'"
+alias wget="wget -c --user-agent 'noleak'"
+
+# Disk Management:
+alias shred="shred -zf"
+
+# DOS Commands:
+alias dir="dir --color=auto"
+alias vdir="vdir --color=auto"
+
+# Searching and Filtering:
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+
+# Version Control (Git):
+alias g="git"
+alias gst="git status"
+alias gc="git commit -m "
+alias ga="git add"
+alias gpl="git pull"
+alias gpom="git pull origin master"
+alias gpu="git push"
+alias gpuom="git push origin master"
+alias gd="git diff"
+alias gch="git checkout"
+alias gnb="git checkout -b"
+alias gac="git add . && git commit -m"
+alias grs="git restore --staged ."
+alias gre="git restore"
+alias gr="git remote"
+alias gcl="git clone"
+alias glg="git log --graph --abbrev-commit --decorate --format=format:'%C(bold green)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold yellow)(%ar)%C(reset)%C(auto)%d%C(reset)%n'' %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
+alias gt="git ls-tree -r master --name-only"
+alias grm="git remote"
+alias gb="git branch"
+alias gf="git fetch"
+
+# Dotfiles Management (Assuming a specific directory setup):
+alias dotfiles='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
+alias dfa='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME add'
+alias dfc='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME commit'
+alias dfp='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME push'
+
+# Miscellaneous:
+alias c="clear"
+alias q="exit"
+
+# Application
+alias code="vscodium"
+
+# Working directory:
+alias w="cd ~/desktop/work"
+alias gh="cd ~/desktop/work/github"
+alias gl="cd ~/desktop/work/gitlab"
+
+# Pacman - https://wiki.archlinux.org/index.php/Pacman_Tips
+alias pacupg='sudo pacman -Syu'
+alias pacin='sudo pacman -S'
+alias paclean='sudo pacman -Sc'
+alias pacins='sudo pacman -U'
+alias paclr='sudo pacman -Scc'
+alias pacre='sudo pacman -R'
+alias pacrem='sudo pacman -Rns'
+alias pacrep='pacman -Si'
+alias pacreps='pacman -Ss'
+alias pacloc='pacman -Qi'
+alias paclocs='pacman -Qs'
+alias pacinsd='sudo pacman -S --asdeps'
+alias pacmir='sudo pacman -Syy'
+alias paclsorphans='sudo pacman -Qdt'
+alias pacrmorphans='sudo pacman -Rs $(pacman -Qtdq)'
+alias pacfileupg='sudo pacman -Fy'
+alias pacfiles='pacman -F'
+alias pacls='pacman -Ql'
+alias pacown='pacman -Qo'
+alias pacupd="sudo pacman -Sy"
+
+function paclist() {
+  pacman -Qqe | xargs -I{} -P0 --no-run-if-empty pacman -Qs --color=auto "^{}\$"
+}
+
+function pacdisowned() {
+  local tmp_dir db fs
+  tmp_dir=$(mktemp --directory)
+  db=$tmp_dir/db
+  fs=$tmp_dir/fs
+
+  trap "rm -rf $tmp_dir" EXIT
+
+  pacman -Qlq | sort -u > "$db"
+
+  find /etc /usr ! -name lost+found \
+    \( -type d -printf '%p/\n' -o -print \) | sort > "$fs"
+
+  comm -23 "$fs" "$db"
+
+  rm -rf $tmp_dir
+}
+
+alias pacmanallkeys='sudo pacman-key --refresh-keys'
+
+function pacmansignkeys() {
+  local key
+  for key in $@; do
+    sudo pacman-key --recv-keys $key
+    sudo pacman-key --lsign-key $key
+    printf 'trust\n3\n' | sudo gpg --homedir /etc/pacman.d/gnupg \
+      --no-permission-warning --command-fd 0 --edit-key $key
+  done
+}
+
+# Check if 'yay' is available
+if command -v yay &>/dev/null; then
+  alias yaconf='yay -Pg'
+  alias yaclean='yay -Sc'
+  alias yaclr='yay -Scc'
+  alias yaupg='yay -Syu'
+  alias yasu='yay -Syu --noconfirm'
+  alias yain='yay -S'
+  alias yains='yay -U'
+  alias yare='yay -R'
+  alias yarem='yay -Rns'
+  alias yarep='yay -Si'
+  alias yareps='yay -Ss'
+  alias yaloc='yay -Qi'
+  alias yalocs='yay -Qs'
+  alias yalst='yay -Qe'
+  alias yaorph='yay -Qtd'
+  alias yainsd='yay -S --asdeps'
+  alias yamir='yay -Syy'
+  alias yaupd="yay -Sy"
+else
+  # 'yay' is not available, use 'pacman'
+  alias yaconf='echo "yay not available"'
+  # Define other aliases or fallback actions for 'pacman' here
+fi
+
+# Check Arch Linux PGP Keyring before System Upgrade to prevent failure.
+function upgrade() {
+  echo ":: Checking ArchLinux and blackarch PGP Keyring..."
+  local installedver="$(sudo pacman -Qi archlinux-keyring | grep -Po '(?<=Version         : ).*')"
+  local currentver="$(sudo pacman -Si archlinux-keyring | grep -Po '(?<=Version         : ).*')"
+  local installedver="$(sudo pacman -Qi blackarch-keyring | grep -Po '(?<=Version         : ).*')"
+  local currentver="$(sudo pacman -Si blackarch-keyring | grep -Po '(?<=Version         : ).*')"
+  if [ "$installedver" != "$currentver" ]; then
+    echo " ArchLinux and blackarch PGP Keyring is out of date."
+    echo " Updating before full system upgrade."
+    sudo pacman -S --needed --noconfirm archlinux-keyring blackarch-keyring
+    sudo sh -c "curl https://archlinux.org/mirrorlist/\?country=all\&protocol=http\&protocol=https\&ip_version=4\&ip_version=6\&use_mirror_status=on -o /etc/pacman.d/mirrorlist && sed -i 's/#S/S/g' /etc/pacman.d/mirrorlist"
+  else
+    echo " Arch Linux PGP Keyring is up to date."
+    echo " Proceeding with full system upgrade."
+  fi
+  if command -v yay &>/dev/null; then
+    yay -Syyu --noconfirm
+  else
+    sudo pacman -Syyu --noconfirm
+  fi
+}
+
+netinfo() {
+# Display network interface information
+echo "----- Network Interfaces -----"
+ip -brief link show
+
+# Display IP address information
+echo "----- IP Addresses -----"
+ip -brief addr show
+
+# Display DNS settings
+echo "----- DNS Settings -----"
+grep nameserver /etc/resolv.conf
+
+# Display network connections
+echo "----- Network Connections -----"
+ss -tunap
+
+# Display firewall settings
+echo "------ Firewall Settings ------"
+sudo iptables -L -v
+
+echo "----------"
+}
+
+whatsmyip () {
+    echo "Fetching your external IP address..."
+    external_ip=$(curl -s https://api64.ipify.org?format=text)
+    if [ -n "$external_ip" ]; then
+        echo "Your external IP address is: $external_ip"
+    else
+        echo "Unable to retrieve external IP address."
+    fi
+}
+

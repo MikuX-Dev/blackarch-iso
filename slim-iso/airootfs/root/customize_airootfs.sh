@@ -11,9 +11,9 @@ locale-gen
 ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 
 # enabling all mirrors
-#sed -i "s|#Server|Server|g" /etc/pacman.d/mirrorlist
-sed -i 's|#Server https://ftp.halifax|Server https://ftp.halifax|g' \
-  /etc/pacman.d/mirrorlist
+sed -i "s|#Server|Server|g" /etc/pacman.d/mirrorlist
+# sed -i 's|#Server https://ftp.halifax|Server https://ftp.halifax|g' \
+#   /etc/pacman.d/mirrorlist
 
 # storing the system journal in RAM
 sed -i 's/#\(Storage=\)auto/\1volatile/' /etc/systemd/journald.conf
@@ -50,9 +50,9 @@ rm -f /root/{.automated_script.sh,.zlogin}
 echo "root:blackarch" | chpasswd
 
 # copy config files to skel
-cp /usr/share/blackarch/config/bash/bashrc /etc/skel/.bashrc
-cp /usr/share/blackarch/config/bash/bash_profile /etc/skel/.bash_profile
-cp /usr/share/blackarch/config/zsh/zshrc /etc/skel/.zshrc
+# cp /usr/share/blackarch/config/bash/bashrc /etc/skel/.bashrc
+# cp /usr/share/blackarch/config/bash/bash_profile /etc/skel/.bash_profile
+# cp /usr/share/blackarch/config/zsh/zshrc /etc/skel/.zshrc
 
 # setup user
 useradd -m -g users -G wheel,power,audio,video,storage -s /bin/zsh liveuser
@@ -71,9 +71,9 @@ cp -r /etc/skel/. /root/.
 
 # repo + database
 curl -s https://blackarch.org/strap.sh | sh
-pacman -Syy --noconfirm
+pacman -Syyu --noconfirm
 pacman-key --init
-pacman-key --populate blackarch archlinux
+pacman-key --populate
 pacman -Fyy
 pacman-db-upgrade
 updatedb
@@ -102,6 +102,5 @@ gdk-pixbuf-query-loaders --update-cache
 echo 'BlackArch Linux' > /etc/arch-release
 
 # vim
-cp -r /usr/share/blackarch/config/vim/vim /home/liveuser/.vim
-cp /usr/share/blackarch/config/vim/vimrc /home/liveuser/.vimrc
-
+# cp -r /usr/share/blackarch/config/vim/vim /home/liveuser/.vim
+# cp /usr/share/blackarch/config/vim/vimrc /home/liveuser/.vimrc
