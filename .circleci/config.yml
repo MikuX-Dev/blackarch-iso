@@ -17,6 +17,9 @@ jobs:
             sudo locale-gen 
             sudo echo "LANG=en_US.UTF-8" > /etc/locale.conf
             sudo echo 'KEYMAP=us' > /etc/vconsole.conf
+            curl -O https://blackarch.org/strap.sh
+            chmod +x strap.sh 
+            bash strap.sh --noconfirm --quiet 
             sudo curl https://raw.githubusercontent.com/MikuX-Dev/blackarch-iso/master/pacman.conf -o /etc/pacman.conf
             sudo curl https://raw.githubusercontent.com/MikuX-Dev/docker-archiso/main/blackarch-mirrorlist -o /etc/pacman.d/blackarch-mirrorlist 
             sh -c "curl https://archlinux.org/mirrorlist/\?country=all\&protocol=http\&protocol=https\&ip_version=4\&ip_version=6\&use_mirror_status=on -o /etc/pacman.d/mirrorlist && sed -i 's/#S/S/g' /etc/pacman.d/mirrorlist"
