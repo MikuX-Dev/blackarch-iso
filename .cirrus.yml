@@ -1,6 +1,10 @@
+regular_task_template: &REGULAR_TASK_TEMPLATE
+  only_if: $CIRRUS_BRANCH == 'master' || $CIRRUS_TAG != '' || $CIRRUS_PR != ''
+  
 container:
   image: mikuxdev/archiso-builder:latest
   KVM: true
+  accel_check_script: emulator -accel-check
   cpu: 2
   memory: 4G
 
