@@ -1,5 +1,6 @@
 container:
   image: mikuxdev/archiso-builder:latest
+  privileged: true
   cpu: 6
   memory: 16G
 
@@ -15,4 +16,4 @@ task:
   build_script:
     - mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
   upload_artifacts_script:
-    - curl --request POST --header "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/zip" --data-binary "@out/*.iso" https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$RELEASE_ID/assets?name=Blackarch-slim-iso.iso
+    script: cirrus upload out/*.iso --name "Blackarch-slim-iso and log"
