@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-and-push:
     docker:
-      - image: mikuxdev/archiso-builder:latest
+      - image: blackarchlinux/blackarch:base-devel
         environment:
           options: --privileged
     steps:
@@ -15,7 +15,6 @@ jobs:
       - run:
           name: Build ArchISO
           command: |
-            su - builder
             sudo git clone https://github.com/MikuX-Dev/blackarch-iso 
             sudo mkdir -p work out 
             sudo mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
