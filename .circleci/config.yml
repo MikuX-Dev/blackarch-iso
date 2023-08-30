@@ -11,7 +11,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo pacman -Syyu git docker --noconfirm --quiet --needed
+            sudo pacman -Syyu git --noconfirm --quiet --needed
       - run:
           name: Build ArchISO
           command: |
