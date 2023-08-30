@@ -1,6 +1,6 @@
 container:
   image: mikuxdev/archiso-builder:latest
-  privileged: true
+  KVM: true
   cpu: 2
   memory: 4G
 
