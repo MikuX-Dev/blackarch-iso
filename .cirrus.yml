@@ -5,9 +5,8 @@ container:
 
 task:
   name: Build and Push Arch ISO Docker Image
-  only_if: $CIRRUS_BRANCH == 'master' || $CIRRUS_PR != ''
   env:
-    GITHUB_TOKEN: ENCRYPTED[!1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef!]
+    GITHUB_TOKEN: ENCRYPTED[dbdc270de8848b06fb63e17ed7723609661a3eea836bdd15712700d7ab1ed5db60a8574a50130e3c435683c143354f9c]
   checkout_script:
     - git clone https://github.com/MikuX-Dev/blackarch-iso
     - mkdir -p work out
