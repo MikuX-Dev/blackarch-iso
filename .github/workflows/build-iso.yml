@@ -1,0 +1,47 @@
+name: Build and Push Arch ISO Docker Image
+
+on:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: "0 0 * * 0" # Every Sunday at midnight
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    container:
+      image: mikuxdev/archiso-builder:latest
+    steps:
+      - name: Checkout files
+        uses: actions/checkout@v3
+    
+      - name: user change
+        run: su - builder
+
+      - name: Install dependencies
+        run: | 
+          sudo yes | pacman -Scc
+          sudo rm -rf /var/cache/pacman/pkg/*
+          sudo pacman-key --init
+          sudo pacman-key --populate
+          sudo sh -c "curl https://archlinux.org/mirrorlist/\?country=all\&protocol=http\&protocol=https\&ip_version=4\&ip_version=6\&use_mirror_status=on -o /etc/pacman.d/mirrorlist && sed -i 's/#S/S/g' /etc/pacman.d/mirrorlist"
+
+      - name: Build ArchISO
+        run: |
+          sudo mkarchiso -v -r -w work -o out slim-iso
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          tag_name: ${{ github.sha }}
+          release_name: Release ${{ github.sha }}
+          draft: false
+          prerelease: false
+
+      - name: Upload ISOs
+        uses: actions/upload-artifact@v2
+        with:
+          name: Blackarch-slim-iso 
+          path: $HOME/archiso_out/*.iso
