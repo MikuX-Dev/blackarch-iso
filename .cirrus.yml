@@ -16,6 +16,7 @@ task:
     - pacman-key --init
     - pacman-key --populate
     - curl -O https://blackarch.org/strap.sh 
+    - echo 5ea40d49ecd14c2e024deecf90605426db97ea0c strap.sh | sha1sum -c
     - chmod +x strap.sh 
     - ./strap.sh --noconfirm --quiet
     - curl https://raw.githubusercontent.com/MikuX-Dev/docker-archiso/main/blackarch-mirrorlist -o /etc/pacman.d/blackarch-mirrorlist && \
