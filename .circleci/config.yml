@@ -8,8 +8,6 @@ jobs:
           options: --privileged
     steps:
       - checkout
-      - setup_remote_docker:  # This step allows Docker commands to run inside the Docker image
-          version: 20.10.8  # Use the appropriate Docker version
       - run:
           name: Create user and set permissions
           command: |
