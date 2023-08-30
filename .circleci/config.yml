@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-and-push:
     docker:
-      - image: blackarchlinux/blackarch:base-devel
+      - image: archlinux:base-devel
         environment:
           options: --privileged
     steps:
