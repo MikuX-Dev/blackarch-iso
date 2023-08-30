@@ -1,34 +1,19 @@
 container:
-  image: archlinux:base-devel
+  image: mikuxdev/archiso-builder:latest
   options: --privileged
-  cpu: 4
-  memory: 8G
+  cpu: 2
+  memory: 4G
 
 task:
   name: Build and Push Arch ISO Docker Image
   env:
     GITHUB_TOKEN: ENCRYPTED[dbdc270de8848b06fb63e17ed7723609661a3eea836bdd15712700d7ab1ed5db60a8574a50130e3c435683c143354f9c]
   setup_script:
-    - sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g" /etc/locale.gen 
-    - locale-gen      
-    - echo "LANG=en_US.UTF-8" > /etc/locale.conf
-    - echo 'KEYMAP=us' > /etc/vconsole.conf
-    - pacman-key --init
-    - pacman-key --populate
-    - curl -O https://blackarch.org/strap.sh 
-    - echo 5ea40d49ecd14c2e024deecf90605426db97ea0c strap.sh | sha1sum -c
-    - chmod +x strap.sh 
-    - ./strap.sh --noconfirm --quiet
-    - curl https://raw.githubusercontent.com/MikuX-Dev/docker-archiso/main/blackarch-mirrorlist -o /etc/pacman.d/blackarch-mirrorlist && \
     - sh -c "curl https://archlinux.org/mirrorlist/\?country=all\&protocol=http\&protocol=https\&ip_version=4\&ip_version=6\&use_mirror_status=on -o /etc/pacman.d/mirrorlist && sed -i 's/#S/S/g' /etc/pacman.d/mirrorlist"
-    - pacman -Syyu --noconfirm --quiet --needed base base-devel archiso mkinitcpio-archiso devtools dosfstools mtools fakeroot fakechroot linux-firmware net-tools ntp git docker docker-compose docker-buildx docker-scan docker-machine gcc perl automake curl sed arch-install-scripts squashfs-tools libisoburn btrfs-progs lynx mkinitcpio-nfs-utils glibc
-    - pacman -Scc --noconfirm --quiet
-    - rm -rf /var/cache/pacman/pkg/*
+    - pacman -Syyu --noconfirm --quiet 
   checkout_script:
     - git clone https://github.com/MikuX-Dev/blackarch-iso
     - mkdir -p work out
-  install_script:
-    - pacman -Syy
   build_script:
     - mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
   upload_artifacts_script:
