@@ -1,7 +1,7 @@
 container:
   image: mikuxdev/archiso-builder:latest
   options: --privileged
-  cpu: 6
+  cpu: 4
   memory: 16G
 
 task:
