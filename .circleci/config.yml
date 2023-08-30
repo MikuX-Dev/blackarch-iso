@@ -4,8 +4,7 @@ jobs:
   build-and-push:
     docker:
       - image: mikuxdev/archiso-builder:latest
-        environment:
-          options: --privileged
+        docker_layer_caching: true
     steps:
       - run:
           name: Create new user with sudo permission
