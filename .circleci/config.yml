@@ -7,11 +7,6 @@ jobs:
         environment:
           options: --privileged
     steps:
-      - run:
-          name: Create new user with sudo permission
-          command: |
-            useradd -m newuser
-            echo 'newuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
       - checkout
       - run:
           name: Install dependencies
@@ -20,7 +15,7 @@ jobs:
       - run:
           name: Build ArchISO
           command: |
-            su - newuser
+            su - builder
             sudo git clone https://github.com/MikuX-Dev/blackarch-iso 
             sudo mkdir -p work out 
             sudo mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
