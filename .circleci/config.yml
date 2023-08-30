@@ -1,24 +1,29 @@
-  workflows:
+version: 2.1
+
+jobs:
+  build-and-push:
+    docker:
+      - image: mikuxdev/archiso-builder:latest
+        environment:
+          options: --privileged
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            pacman -Syy
+      - run:
+          name: Build ArchISO
+          command: |
+            git clone https://github.com/MikuX-Dev/blackarch-iso 
+            mkdir -p work out 
+            mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
+      - store_artifacts:
+          path: out/*.iso
+          destination: Blackarch-slim-iso
+
+workflows:
   version: 2.1
   build-and-push-workflow:
     jobs:
       - build-and-push
-build-and-push:
-  docker:
-    - image: mikuxdev/archiso-builder:latest
-      environment:
-        options: --privileged
-  steps:
-    - checkout
-    - run:
-        name: Install dependencies
-        command: |
-          pacman -Syy
-    - run:
-        name: Build ArchISO
-        command: |
-          mkdir -p work out 
-          mkarchiso -v -r -w work -o out slim-iso
-    - store_artifacts:
-        path: out/*.iso
-        destination: Blackarch-slim-iso
