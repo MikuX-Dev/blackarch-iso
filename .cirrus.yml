@@ -1,26 +1,19 @@
-regular_task_template: &REGULAR_TASK_TEMPLATE
-  only_if: $CIRRUS_BRANCH == 'master' || $CIRRUS_TAG != '' || $CIRRUS_PR != ''
+  stages:
+    - build
 
-container:
-  image: mikuxdev/archiso-builder:latest
-  KVM: true
-  privileged: true
-  accel_check_script: emulator -accel-check
-  cpu: 3
-  memory: 8G
-
-task:
-  <<: *REGULAR_TASK_TEMPLATE
-  name: Build and Push Arch ISO Docker Image
-  env:
-    GITHUB_TOKEN: ENCRYPTED[dbdc270de8848b06fb63e17ed7723609661a3eea836bdd15712700d7ab1ed5db60a8574a50130e3c435683c143354f9c]
-  setup_script:
-    - sh -c "curl https://archlinux.org/mirrorlist/\?country=all\&protocol=http\&protocol=https\&ip_version=4\&ip_version=6\&use_mirror_status=on -o /etc/pacman.d/mirrorlist && sed -i 's/#S/S/g' /etc/pacman.d/mirrorlist"
-    - pacman -Syyu --noconfirm --quiet 
-  checkout_script:
-    - git clone https://github.com/MikuX-Dev/blackarch-iso
-    - mkdir -p work out
-  build_script:
-    - mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
-  upload_artifacts_script:
-    - cirrus upload out/*.iso --name "Blackarch-slim-iso"
+  build:
+    stage: build
+    <<: *REGULAR_TASK_TEMPLATE
+    container: 
+      image: mikuxdev/archiso-builder:latest
+      privileged: true
+      accel_check_script: emulator -accel-check
+      cpu: 4
+      memory: 4G      
+    script:
+      - sh -c "curl https://archlinux.org/mirrorlist/\?country=all\&protocol=http\&protocol=https\&ip_version=4\&ip_version=6\&use_mirror_status=on -o /etc/pacman.d/mirrorlist && sed -i 's/#S/S/g' /etc/pacman.d/mirrorlist"
+      - pacman -Syyu --noconfirm --quiet 
+      - git clone https://github.com/MikuX-Dev/blackarch-iso
+      - mkdir -p work out
+      - mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
+      - cirrus upload out/*.iso --name "Blackarch-slim-iso"
