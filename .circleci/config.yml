@@ -15,7 +15,6 @@ jobs:
             sudo locale-gen 
             sudo echo "LANG=en_US.UTF-8" > /etc/locale.conf
             sudo echo 'KEYMAP=us' > /etc/vconsole.conf
-            sudo rm /var/lib/pacman/sync/*
             sudo rm -rf /etc/pacman.d/gnupg/* 
             sudo curl -O https://blackarch.org/strap.sh
             sudo chmod +x strap.sh 
