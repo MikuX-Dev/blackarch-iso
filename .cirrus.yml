@@ -1,14 +1,16 @@
 regular_task_template: &REGULAR_TASK_TEMPLATE
   only_if: $CIRRUS_BRANCH == 'master' || $CIRRUS_TAG != '' || $CIRRUS_PR != ''
-  
+
 container:
   image: mikuxdev/archiso-builder:latest
   KVM: true
+  privileged: true
   accel_check_script: emulator -accel-check
-  cpu: 2
-  memory: 4G
+  cpu: 3
+  memory: 8G
 
 task:
+  <<: *REGULAR_TASK_TEMPLATE
   name: Build and Push Arch ISO Docker Image
   env:
     GITHUB_TOKEN: ENCRYPTED[dbdc270de8848b06fb63e17ed7723609661a3eea836bdd15712700d7ab1ed5db60a8574a50130e3c435683c143354f9c]
