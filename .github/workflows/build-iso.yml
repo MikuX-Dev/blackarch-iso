@@ -27,16 +27,11 @@ jobs:
         run: |
           git clone https://github.com/MikuX-Dev/blackarch-iso 
           mkdir -p work out 
-
-          script_command=("mkarchiso" "-v" "-r" "-w" "work" "-o" "out" "blackarch-iso/slim-iso")
-          
-          "${script_command[@]}" &> "output.log"
-          
-          rm -rf work/
+          mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
 
       - name: Upload ISOs
         uses: actions/upload-artifact@v2
         with:
           name: Blackarch-slim-iso and log 
-          path: out/*.iso blackarch-iso/output.log
+          path: out/*.iso 
 
