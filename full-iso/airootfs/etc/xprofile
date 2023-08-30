@@ -6,9 +6,7 @@ if [ ! -z "$vbox" ]
 then
   /usr/bin/VBoxClient --seamless
   /usr/bin/VBoxClient --clipboard
+  /usr/bin/VBoxClient --draganddrop
   /usr/bin/VBoxClient --vmsvga
 fi
-
-# wallpaper
-exec feh --bg-scale /usr/share/blackarch/wallpaper.jpg &
 

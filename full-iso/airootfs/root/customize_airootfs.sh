@@ -24,7 +24,8 @@ sed -i 's/#\(HandleHibernateKey=\)hibernate/\1ignore/' /etc/systemd/logind.conf
 sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' /etc/systemd/logind.conf
 
 # enable useful services and display manager
-enabled_services=('choose-mirror.service' 'lxdm.service' 'dbus' 'pacman-init')
+enabled_services=('choose-mirror.service' 'lightdm.service' 'dbus' 'pacman-init'
+  'NetworkManager' 'irqbalance' 'vboxservice')
 systemctl enable ${enabled_services[@]}
 systemctl set-default graphical.target
 
@@ -48,15 +49,31 @@ rm -f /root/{.automated_script.sh,.zlogin}
 # setting root password
 echo "root:blackarch" | chpasswd
 
+# copy config files to skel
+cp /usr/share/blackarch/config/bash/bashrc /etc/skel/.bashrc
+cp /usr/share/blackarch/config/bash/bash_profile /etc/skel/.bash_profile
+cp /usr/share/blackarch/config/zsh/zshrc /etc/skel/.zshrc
+
+# setup user
+useradd -m -g users -G wheel,power,audio,video,storage -s /bin/zsh liveuser
+echo "liveuser:blackarch" | chpasswd
+ln -sf /usr/share/icons/blackarch-icons/apps/scalable/distributor-logo-blackarch.svg /home/liveuser/.face
+mkdir -p /home/liveuser/Desktop
+chown -R liveuser:users /home/liveuser/Desktop
+chmod -R 755 /home/liveuser/Desktop
+ln -sf /usr/share/applications/calamares.desktop /home/liveuser/Desktop/calamares.desktop
+sed -i -e "s|Install System|Install BlackArch|g" /usr/share/applications/calamares.desktop
+ln -sf /usr/share/applications/xfce4-terminal-emulator.desktop /home/liveuser/Desktop/terminal.desktop
+chmod +x /home/liveuser/Desktop/*.desktop
+
 # copy files over to home
 cp -r /etc/skel/. /root/.
 
-# setup repository, add pacman.conf entry, sync databases
+# repo + database
 curl -s https://blackarch.org/strap.sh | sh
 pacman -Syy --noconfirm
 pacman-key --init
 pacman-key --populate blackarch archlinux
-#pkgfile -u
 pacman -Fyy
 pacman-db-upgrade
 updatedb
@@ -67,89 +84,24 @@ ln -sf /etc/fonts/conf.avail/* /etc/fonts/conf.d
 rm -f /etc/fonts/conf.d/05-reset-dirs-sample.conf
 rm -f /etc/fonts/conf.d/09-autohint-if-no-hinting.conf
 
-# default shell
-chsh -s /bin/bash
-
-# download and install exploits, but remove bin-sploits from exploit-db
-sploitctl -f 1 -t 5 -r 2 -XR
-sploitctl -f 2 -t 5 -r 2 -XR
-sploitctl -f 3 -t 5 -r 2 -XR
-rm -rf /usr/share/exploits/exploit-db/exploitdb-bin-sploits
-
 # temporary fixes for ruby based tools
-cd /usr/share/arachni/ && rm -f Gemfile.lock &&
-  bundle-2.3 config build.nokogiri --use-system-libraries &&
-  bundle-2.3 install --path vendor/bundle && rm -f Gemfile.lock
-cd /usr/share/smbexec/ && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --path vendor/bundle && rm -f Gemfile.lock
-cd /usr/share/beef/ && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --path vendor/bundle && rm -f Gemfile.lock
-cd /usr/share/catphish && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --path vendor/bundle && rm -f Gemfile.lock
-cd /usr/share/wpbrute-rpc && rm -f Gemfile.lock
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --without test development --path vendor/bundle &&
-cd /usr/share/staekka && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  build install --no-cache --deployment --path vendor/bundle &&
-cd /usr/share/vane && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --without test development --path vendor/bundle &&
-cd /usr/share/vcsmap && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --without test development --path vendor/bundle &&
-cd /usr/share/vsaudit && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --path vendor/bundle && rm -f Gemfile.lock
-cd /usr/share/whitewidow && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --path vendor/bundle && rm -f Gemfile.lock
-cd /usr/share/sitediff && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --path vendor/bundle && rm -f Gemfile.lock
-cd /usr/share/wordpress-exploit-framework && rm -f Gemfile.lock
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --path vendor/bundle && rm -f Gemfile.lock
-cd /usr/share/kautilya && rm -f Gemfile.lock &&
-  bundle config build.nokogiri --use-system-libraries &&
-  bundle install --path vendor/bundle && rm -f Gemfile.lockk
 cd /usr/share/whatweb && rm -f Gemfile.lock &&
   bundle config build.nokogiri --use-system-libraries &&
   bundle install --path vendor/bundle && rm -f Gemfile.lock
 
-# remove not needed .desktop entries
-rm -f /usr/share/xsessions/blackarch-dwm.desktop
-rm -f /usr/share/xsessions/openbox-kde.desktop
-rm -f /usr/share/xsessions/i3-with-shmlog.desktop
-rm -f /usr/share/xsessions/xfce.desktop
-rm -f /usr/share/xsessions/*gnome*.desktop
-rm -f /usr/share/xsessions/*kde*.desktop
-rm -f /root/install.txt
+# change default jdk
+archlinux-java set java-20-openjdk
 
-# add install.txt file
-echo "Type blackarch-install and follow the instructions." > /root/INSTALL
+# Temporary fix for calamares
+#pacman -U --noconfirm https://archive.archlinux.org/packages/d/dosfstools/dosfstools-4.1-3-x86_64.pkg.tar.xz
 
 # GDK Pixbuf
 gdk-pixbuf-query-loaders --update-cache
-
-# tmp fix for awesome exit()
-sed -i 's|local visible, action = cmd(item, self)|local visible, action = cmd(0, self)|' /usr/share/awesome/lib/awful/menu.lua
-
-# lxdm
-rm -rf /etc/lxdm
-mv /etc/lxdm-blackarch /etc/lxdm
-
-# fluxbox
-rm -rf /usr/share/fluxbox
-cp -r /root/.fluxbox /usr/share/fluxbox
 
 # /etc
 echo 'BlackArch Linux' > /etc/arch-release
 
 # vim
-cp -r /usr/share/blackarch/config/vim/vim /root/.vim
-cp /usr/share/blackarch/config/vim/vimrc /root/.vimrc
+cp -r /usr/share/blackarch/config/vim/vim /home/liveuser/.vim
+cp /usr/share/blackarch/config/vim/vimrc /home/liveuser/.vimrc
 
