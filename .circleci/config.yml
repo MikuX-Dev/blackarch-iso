@@ -8,6 +8,15 @@ jobs:
           options: --privileged
     steps:
       - checkout
+      - setup_remote_docker:  # This step allows Docker commands to run inside the Docker image
+          version: 20.10.8  # Use the appropriate Docker version
+      - run:
+          name: Create user and set permissions
+          command: |
+            useradd -m -G sudo,wheel builder -s /bin/bash 
+            echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder
+            chmod 0440 /etc/sudoers.d/builder
+            su - builder  
       - run:
           name: Install dependencies
           command: |
