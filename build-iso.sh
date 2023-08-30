@@ -18,7 +18,7 @@ echo "2. full-iso"
 echo "3. all-iso"
 
 # Read the user's choice
-read -p "Enter your choice (1/2/3/): " choice
+read -p "Enter your choice (1/2/3): " choice
 
 # Set the iso_type variable based on the user's choice
 case $choice in

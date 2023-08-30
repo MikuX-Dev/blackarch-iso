@@ -2,9 +2,9 @@ name: Build and Push Arch ISO Docker Image
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   schedule:
     - cron: "0 0 * * 0" # Every Sunday at midnight
 
@@ -12,16 +12,13 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     container:
-      image: mikuxdev/archiso-builder
+      image: mikuxdev/archiso-builder:latest
       options: --privileged
 
     steps:
       - name: Checkout files
         uses: actions/checkout@v3
  
-    #   - name: user change
-    #     run: su - builder
-
       - name: Install dependencies
         run: | 
           pacman -Syy
@@ -30,10 +27,16 @@ jobs:
         run: |
           git clone https://github.com/MikuX-Dev/blackarch-iso 
           mkdir -p work out 
-          mkarchiso -v -r -w work -o out blackarch-iso/slim-iso || su - builder | mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
+
+          script_command=("mkarchiso" "-v" "-r" "-w" "work" "-o" "out" "blackarch-iso/slim-iso")
+          
+          "${script_command[@]}" &> "output.log"
+          
+          rm -rf work/
 
       - name: Upload ISOs
         uses: actions/upload-artifact@v2
         with:
-          name: Blackarch-slim-iso 
-          path: out/*.iso
+          name: Blackarch-slim-iso and log 
+          path: out/*.iso blackarch-iso/output.log
+
