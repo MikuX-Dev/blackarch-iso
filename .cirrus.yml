@@ -16,4 +16,4 @@ task:
   build_script:
     - mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
   upload_artifacts_script:
-    script: cirrus upload out/*.iso --name "Blackarch-slim-iso and log"
+    - cirrus upload out/*.iso --name "Blackarch-slim-iso and log"
