@@ -17,7 +17,7 @@ jobs:
           command: |
             git clone https://github.com/MikuX-Dev/blackarch-iso 
             mkdir -p work out 
-            mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
+            sudo mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
       - store_artifacts:
           path: out/*.iso
           destination: Blackarch-slim-iso
