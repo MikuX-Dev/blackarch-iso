@@ -1,6 +1,6 @@
 container:
   image: mikuxdev/archiso-builder:latest
-  privileged: true
+  options: --privileged
   cpu: 6
   memory: 16G
 
@@ -16,4 +16,4 @@ task:
   build_script:
     - mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
   upload_artifacts_script:
-    - cirrus upload out/*.iso --name "Blackarch-slim-iso and log"
+    - cirrus upload out/*.iso --name "Blackarch-slim-iso"
