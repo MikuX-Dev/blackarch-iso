@@ -1,41 +1,19 @@
-version: '2'
+container:
+  image: mikuxdev/archiso-builder:latest
+  cpu: 6
+  memory: 16G
 
-workflows:
-  build-and-push:
-    jobs:
-      - build-and-push:
-          filters:
-            branches:
-              only:
-                - master
-            paths-ignore:
-              - '*'
-
-jobs:
-  build-and-push:
-    machine:
-      image: 'mikuxdev/archiso-builder:latest'
-      privileged: true
-
-    environment:
-      GITHUB_PAT: "ENCRYPTED[dbdc270de8848b06fb63e17ed7723609661a3eea836bdd15712700d7ab1ed5db60a8574a50130e3c435683c143354f9c]"
-
-    steps:
-      - checkout: {}
-      
-      - run:
-          name: Install dependencies
-          command: |
-            sudo pacman -Syy
-
-      - run:
-          name: Build ArchISO
-          command: |
-            git clone https://github.com/MikuX-Dev/blackarch-iso
-            mkdir -p work out
-            mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
-
-      - artifacts:
-          upload_paths:
-            - out/*.iso
-          name: Blackarch-slim-iso
+task:
+  name: Build and Push Arch ISO Docker Image
+  only_if: $CIRRUS_BRANCH == 'master' || $CIRRUS_PR != ''
+  env:
+    GITHUB_TOKEN: ENCRYPTED[!1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef!]
+  checkout_script:
+    - git clone https://github.com/MikuX-Dev/blackarch-iso
+    - mkdir -p work out
+  install_script:
+    - pacman -Syy
+  build_script:
+    - mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
+  upload_artifacts_script:
+    - curl --request POST --header "Authorization: token $GITHUB_TOKEN" --header "Content-Type: application/zip" --data-binary "@out/*.iso" https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$RELEASE_ID/assets?name=Blackarch-slim-iso.iso
