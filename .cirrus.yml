@@ -1,0 +1,41 @@
+version: '2'
+
+workflows:
+  build-and-push:
+    jobs:
+      - build-and-push:
+          filters:
+            branches:
+              only:
+                - master
+            paths-ignore:
+              - '*'
+
+jobs:
+  build-and-push:
+    machine:
+      image: 'mikuxdev/archiso-builder:latest'
+      privileged: true
+
+    environment:
+      GITHUB_PAT: "ENCRYPTED[dbdc270de8848b06fb63e17ed7723609661a3eea836bdd15712700d7ab1ed5db60a8574a50130e3c435683c143354f9c]"
+
+    steps:
+      - checkout: {}
+      
+      - run:
+          name: Install dependencies
+          command: |
+            sudo pacman -Syy
+
+      - run:
+          name: Build ArchISO
+          command: |
+            git clone https://github.com/MikuX-Dev/blackarch-iso
+            mkdir -p work out
+            mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
+
+      - artifacts:
+          upload_paths:
+            - out/*.iso
+          name: Blackarch-slim-iso
