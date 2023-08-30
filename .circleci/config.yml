@@ -4,7 +4,8 @@ jobs:
   build-and-push:
     docker:
       - image: mikuxdev/archiso-builder:latest
-        docker_layer_caching: true
+        environment:
+          options: --privileged
     steps:
       - run:
           name: Create new user with sudo permission
@@ -19,9 +20,9 @@ jobs:
       - run:
           name: Build ArchISO
           command: |
-            git clone https://github.com/MikuX-Dev/blackarch-iso 
-            mkdir -p work out 
-            mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
+            sudo -u newuser git clone https://github.com/MikuX-Dev/blackarch-iso 
+            sudo -u newuser mkdir -p work out 
+            sudo -u newuser mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
       - store_artifacts:
           path: out/*.iso
           destination: Blackarch-slim-iso and log
