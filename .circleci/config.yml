@@ -20,6 +20,7 @@ jobs:
       - run:
           name: Build ArchISO
           command: |
+            su - newuser
             sudo git clone https://github.com/MikuX-Dev/blackarch-iso 
             sudo mkdir -p work out 
             sudo mkarchiso -v -r -w work -o out blackarch-iso/slim-iso
